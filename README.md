@@ -36,7 +36,7 @@ This tool is strictly for educational and defensive research purposes, allowing 
 Clone the Repository
 
 ```
-git clone https://github.com/yourusername/python-honeypot.git
+git clone https://github.com/lolo-ikh/Honeypot.git
 cd python-honeypot
 ```
 Install Dependencies
