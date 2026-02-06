@@ -1,5 +1,5 @@
 # for more info on SSH: check this youtube video: https://www.youtube.com/watch?v=P0Fk-K2eZF8
-
+# i have created server.key and sever.key.pub using the command: ssh-keygen -t rsa -b 2048 -f server.key
 # Libraries
 import logging
 from logging.handlers import RotatingFileHandler
@@ -27,7 +27,7 @@ creds_logger.addHandler(creds_handler)
 
 # Emulated Shell
 def emulated_shell(channel, client_ip): # dialog is our way to communicate or sending messages over the ssh connection
-    channel.send(b'corporate-jumpbox2$ ') # This is the prompt that the attacker will see when they connect to the honeypot. It mimics a typical shell prompt.
+    channel.send(b'lolo-jumpbox2$ ') # This is the prompt that the attacker will see when they connect to the honeypot. It mimics a typical shell prompt.
     command = b"" # We initialize an empty byte string to store the command that the attacker will type.
     while True: 
         char = channel.recv(1) 
@@ -51,7 +51,7 @@ def emulated_shell(channel, client_ip): # dialog is our way to communicate or se
                 response = b"\n" + bytes(command.strip()) + b": command not found\r\n" # For any other command, we respond with a generic "command not found" message.
 
         channel.send(response)
-        channel.send(b'corporate-jumpbox2$ ') # After processing the command, we send the prompt again for the next command.
+        channel.send(b'lolo-jumpbox2$ ') # After processing the command, we send the prompt again for the next command.
         command = b"" # We reset the command variable to capture the next command from the attacker.
 # SSH Server + Sockets
 class Server(paramiko.ServerInterface): # We create a class called Server that inherits from paramiko.ServerInterface. This class will handle the SSH server functionality, such as authentication and channel requests.
@@ -90,10 +90,23 @@ def client_handle(client, addr, username, password):
         transport.local_version = SSH_BANNER
         server = Server(client_ip = client_ip, input_username=username, input_password=password)
 
-        transport.add_server_key(HOST_KEY)
+        transport.add_server_key(host_key)
         transport.start_server(server=server)
-    except:
-        pass
+
+        channel = transport.accept(100)
+        if channel is None:
+            print("No channel was opened.")
+        standard_banner = "Welcome to the lolo jumpbox!\r\n\r\n"
+        channel.send(standard_banner)
+        emulated_shell(channel, client_ip=client_ip)
+
+    except Exception as error:
+        print(error)
+        print("!!! ERROR !!!")
     finally:
-        pass
+        try:
+            transport.close()
+        except Exception as error:
+            print(error)
+            print("!!! ERROR !!!")
 # Provision SSH-based Honeypot
