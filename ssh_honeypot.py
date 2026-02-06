@@ -17,6 +17,8 @@ creds_handler = RotatingFileHandler('cmd_audits.log', maxBytes=2000, backupCount
 creds_handler.setFormatter(logging_format)
 creds_logger.addHandler(creds_handler)
 
+
+
 # Emulated Shell
 
 # SSH Server + Sockets
